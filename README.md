@@ -1,6 +1,6 @@
 # Cuarta tarea de APA 2023: Generación de números aleatorios
 
-## Nom i cognoms
+## Arnau Piñero Masegosa
 
 ## Generación de números aleatorios usando el algoritmo LGC
 
@@ -9,7 +9,9 @@ El algoritmo de generación lineal congruente
 secuencias pseudoaleatorias de características controladas. Se basa en aplicar
 iterativamente la fórmula recursiva siguiente:
 
-$$ x_{n + 1} = (a x_n + c) \mod m $$
+$$
+x_{n + 1} = (a x_n + c) \mod m
+$$
 
 Donde se denomina *módulo* a $m > 0$, *multiplicador* a $0 < a < m$, *incremento* a
 $0 \le c < m$, y $0 \le x_0 < m$ es el valor inicial, o *semilla*, de la secuencia
@@ -31,11 +33,13 @@ tenga el periodo máximo, igual a $m$:
 
 Por ejemplo, el generador aleatorio del estándar POSIX usa los valores siguientes:
 
-$$\begin{eqnarray*}
+$$
+\begin{eqnarray*}
         m & = & 2^{48} \\
         a & = & 25214903917 \\
         c & = & 11
-\end{eqnarray*}$$
+\end{eqnarray*}
+$$
 
 ## Ejercicios
 
@@ -50,14 +54,12 @@ $0 \le x_n < m$ usando el método LGC con las características siguientes:
 - Los objetos de la clase serán iteradores, para lo que habrá de definirse el método
   mágico `__next__()`, que será el que efectuará la generación en sí misma y deberá
   devolver el número aleatorio siguiente.
-
 - Los valores de `m`, `a` y `c` y la semilla `x0` deben ser configurables al crear el
   objeto (argumentos opcionales del método mágico `__init__()`). Estos cuatro argumentos
   opcionales serán indicados, obligatoriamente, por clave (no pueden ser posicionales).
 
   Por defecto, los valores de `m`, `a` y `c` serán los usados por el estándar POSIX. El
   de la semilla será `x0=1212121`.
-
 - El método mágico [`__call__()`](https://docs.python.org/3/reference/datamodel.html#object.__call__)
   que sobrecarga la llamada a función, es decir, el uso del objeto como si fuera una
   función con sus argumentos entre paréntesis, se usará para reiniciar la secuencia con
@@ -101,7 +103,6 @@ aleatorios en el rango $0 \le x_n < m$ que en el ejercicio anterior.
 
 - Los valores de `m`, `a` y `c` y la semilla `x0` deben ser configurables al crear la
   función, y tendrán los mismos valores por defecto que en el caso de la clase `Aleat`.
-
 - En caso de enviársele un valor al generador, con su método `send()`, éste debe
   reiniciar la secuencia tomando el argumento como semilla de la nueva secuencia.
 
@@ -143,19 +144,16 @@ a ejecutar con la biblioteca `doctest`:
 
 - El fichero debe incluir una cadena de documentación que incluirá el nombre del alumno
   y una descripción el contenido del fichero.
-
 - La cadena de documentación de la clase `Aleat` debeá incluir:
 
   - Una descripción del cometido de la clase.
   - Una descripción de los atributos y métodos de la clase.
   - Las pruebas unitarias correspondientes.
-
 - La cadena de documentación de la función generadora `aleat()` deberá incluir:
 
   - Una descripción del cometido de la función.
   - Los argumentos de la función y la salida proporcionada.
   - Las pruebas unitarias correspondientes.
-
 - Se valorará lo pythónico de la solución; en concreto, su claridad y sencillez, y el
   uso de los estándares marcados por PEP-ocho.
 
@@ -170,6 +168,86 @@ resultado de la ejecución de los tests unitarios.
 Inserte a continuación el código de los métodos desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+```python
+"""
+Este fichero contiene dos implementaciones de generadores de numeros aleatorios. 
+Estos se generan mediante el metodo LGC.
+Se implementa este tipo de generadores en una clase y en una función.
+"""
+
+class Aleat:
+    """
+    Clase Aleat, que genera numeros aleatorios usando el metodo LGC
+
+    >>> rand = Aleat(m= 32, a=9, c=13, x0=11)
+    >>> for _ in rance(4):
+    ...     print(next(rand))
+    ...
+
+    >>> rand(29)
+    >>> for _ in range(4):
+    ...     print(next(rand))
+    ...
+    """
+
+    def __init__(self, *, m=2147483647, a=1103515245, c=12345, x0=1212121):
+        """
+        Inicializa el generador de numeros aleatorios
+        """
+
+        self.m = m
+        self.a = a
+        self.c = c
+        self.x = x0
+
+    def __next__(self):
+        """
+        Genera y devuelve el siguiente numero de la secuencia
+        """
+
+        self.x = (self.a * self.x + self.c) % self.m
+        return self.x
+  
+    def __call__(self, x0):
+        """
+        Reinicia la secuencia con la semilla x0 indicada
+        """
+
+        self.x = x0
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+
+def aleat(m=2147483647, a=1103515245, c=12345, x0=1212121):
+    """
+    Funcion generadora de numeros aleatorios mediante el metodo LGC
+
+    >>> rand = aleat(m=64, a=5, c=46, x0=36)
+    >>> for _ in range(4):
+    ...     print(next(rand))
+    ...
+
+    >>> rand.send(24)
+    38
+    >>> for _ in range(4):
+    ...     print(next(rand))
+    ...
+
+    """
+
+    x = x0
+    while True:
+        yield x
+        x = (a * x + c) % m
+
+        try:
+            x = yield
+        except GeneratorExit:
+            break
+```
 
 #### Subida del resultado al repositorio GitHub y *pull-request*
 
